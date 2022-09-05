@@ -1,4 +1,4 @@
-module spacebase
+module github.com/CryptFiend01/spacebase
 
 go 1.17
 
