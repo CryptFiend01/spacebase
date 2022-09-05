@@ -3,7 +3,8 @@ package gameserver
 import (
 	"encoding/binary"
 	"net"
-	"spacebase/pub"
+
+	"github.com/CryptFiend01/spacebase/pub"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/wonderivan/logger"

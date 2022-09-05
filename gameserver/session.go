@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net"
 	"reflect"
-	"spacebase/pub"
+
+	"github.com/CryptFiend01/spacebase/pub"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/wonderivan/logger"
