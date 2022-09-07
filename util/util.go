@@ -1,7 +1,9 @@
 package util
 
 import (
+	"crypto/rand"
 	"io/ioutil"
+	"math/big"
 	"os"
 
 	"github.com/wonderivan/logger"
@@ -22,4 +24,9 @@ func ReadFile(fileName string) []byte {
 	}
 
 	return s
+}
+
+func RandomInt(n int) int {
+	result, _ := rand.Int(rand.Reader, big.NewInt(int64(n)))
+	return int(result.Int64())
 }
