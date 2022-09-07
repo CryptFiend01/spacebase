@@ -179,7 +179,7 @@ func sendData(conn *net.Conn, cmd int32, data []byte, reqId int, connectId int) 
 	return true
 }
 
-func sendError(conn *net.Conn, cmd int32, errNo int, reqId int, connectId int) bool {
+func SendError(conn *net.Conn, cmd int32, errNo int, reqId int, connectId int) bool {
 	len := 16
 	buf := make([]byte, len)
 	binary.LittleEndian.PutUint32(buf[0:4], uint32(connectId%100000))
@@ -275,7 +275,7 @@ func (svr *GameServer) SendPlayerErr(playerId int, cmd int32, errNo int) bool {
 	if !ok {
 		return false
 	}
-	sendError(sess.conn, cmd, errNo, 0, playerId)
+	SendError(sess.conn, cmd, errNo, 0, playerId)
 	return true
 }
 
