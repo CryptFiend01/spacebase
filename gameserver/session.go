@@ -47,7 +47,7 @@ func (sess *Session) handleRead() {
 				Msg:      nil,
 				Fproc:    onPlayerDisconnect,
 			}
-			PushMsg(req)
+			PushMsgFunc(req)
 		}
 
 		delete(sess.server.sessions, sess.sessionId)
@@ -108,7 +108,7 @@ func (sess *Session) handleRead() {
 					Msg:      msg,
 					Fproc:    f,
 				}
-				PushMsg(req)
+				PushMsgFunc(req)
 			} else {
 				req := &pub.Request{
 					Conn:     sess.conn,
@@ -117,12 +117,12 @@ func (sess *Session) handleRead() {
 					Msg:      nil,
 					Fproc:    f,
 				}
-				PushMsg(req)
+				PushMsgFunc(req)
 			}
 		}
 	}
 }
 
 func onPlayerDisconnect(conn *net.Conn, playerId int, reqId int, imsg proto.Message) {
-	OnDisconnect(playerId)
+	DisconnectFunc(playerId)
 }

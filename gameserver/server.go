@@ -15,10 +15,6 @@ type GameServer struct {
 	sessions map[int]*Session
 }
 
-type NameFunc func(cmd int32) string
-type PushMsgFunc func(msg *pub.Request)
-type HandlerFunc func(playerId int)
-
 const (
 	CLoginCmd      = 1
 	SLoginCmd      = 2
@@ -28,13 +24,13 @@ const (
 )
 
 var (
-	callbacks    map[int32]pub.ReqFunc
-	svr          *GameServer
-	IsLogMsg     bool
-	CmdNameFunc  NameFunc
-	PushMsg      PushMsgFunc
-	OnDisconnect HandlerFunc
-	RegisterMsg  func()
+	callbacks       map[int32]pub.ReqFunc
+	svr             *GameServer
+	IsLogMsg        bool
+	CmdNameFunc     func(cmd int32) string
+	PushMsgFunc     func(msg *pub.Request)
+	DisconnectFunc  func(playerId int)
+	RegisterMsgFunc func()
 )
 
 func NewGameServer(endpoint string) *GameServer {
@@ -46,7 +42,9 @@ func NewGameServer(endpoint string) *GameServer {
 }
 
 func (svr *GameServer) Start() bool {
-	RegisterMsg()
+	if RegisterMsgFunc != nil {
+		RegisterMsgFunc()
+	}
 
 	addr, err := net.ResolveTCPAddr("tcp4", svr.endpoint)
 	if err != nil {
