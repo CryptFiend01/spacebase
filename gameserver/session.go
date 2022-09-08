@@ -68,6 +68,20 @@ func (sess *Session) handleRead() {
 
 		if cmd == CHeartBeatCmd {
 			onHeartBeat(sess.conn, connectId, reqId, data)
+		} else if cmd == SDisconnectCmd {
+			playerId := connectId + sess.sessionId*100000
+			delete(sess.players, playerId)
+			sess.playerNum = len(sess.players)
+
+			req := &pub.Request{
+				Conn:     sess.conn,
+				PlayerId: playerId,
+				ClientIp: clientIp,
+				Reqid:    reqId,
+				Msg:      nil,
+				Fproc:    onPlayerDisconnect,
+			}
+			PushMsgFunc(req)
 		} else {
 			f := getCallback(cmd)
 			if f == nil {
@@ -81,9 +95,6 @@ func (sess *Session) handleRead() {
 			if cmd == CLoginCmd {
 				sess.players[playerId] = true
 				sess.playerNum += 1
-			} else if cmd == SDisconnectCmd {
-				delete(sess.players, playerId)
-				sess.playerNum = len(sess.players)
 			}
 
 			if dataLen > 0 {
