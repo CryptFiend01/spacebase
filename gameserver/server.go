@@ -45,7 +45,7 @@ func NewGameServer(endpoint string) *GameServer {
 }
 
 func check() bool {
-	if RegisterMsgFunc != nil {
+	if RegisterMsgFunc == nil {
 		logger.Error("forget to set RegisterMsgFunc.")
 		return false
 	}
