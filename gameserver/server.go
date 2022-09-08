@@ -31,6 +31,7 @@ var (
 	PushMsgFunc     func(msg *pub.Request)
 	DisconnectFunc  func(playerId int)
 	RegisterMsgFunc func()
+	MsgProtoName    string
 )
 
 func NewGameServer(endpoint string) *GameServer {
@@ -41,10 +42,40 @@ func NewGameServer(endpoint string) *GameServer {
 	return svr
 }
 
-func (svr *GameServer) Start() bool {
+func check() bool {
 	if RegisterMsgFunc != nil {
-		RegisterMsgFunc()
+		logger.Error("forget to set RegisterMsgFunc.")
+		return false
 	}
+
+	if MsgProtoName == "" {
+		logger.Error("forget to set MsgProtoName.")
+		return false
+	}
+
+	if CmdNameFunc == nil {
+		logger.Error("forget to set CmdNameFunc.")
+		return false
+	}
+
+	if PushMsgFunc == nil {
+		logger.Error("forget to set PushMsgFunc.")
+		return false
+	}
+
+	if DisconnectFunc == nil {
+		logger.Error("forget to set DisconnectFunc.")
+		return false
+	}
+	return true
+}
+
+func (svr *GameServer) Start() bool {
+	if !check() {
+		return false
+	}
+
+	RegisterMsgFunc()
 
 	addr, err := net.ResolveTCPAddr("tcp4", svr.endpoint)
 	if err != nil {

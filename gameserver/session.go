@@ -87,7 +87,7 @@ func (sess *Session) handleRead() {
 			}
 
 			if dataLen > 0 {
-				msgName := fmt.Sprintf("bustabit_msg.%s", cmdName)
+				msgName := fmt.Sprintf("%s.%s", MsgProtoName, cmdName)
 				msgType := proto.MessageType(msgName)
 				if msgType == nil {
 					logger.Error("not find msg %s", msgName)
