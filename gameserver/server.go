@@ -35,6 +35,8 @@ var (
 )
 
 func NewGameServer(endpoint string) *GameServer {
+	callbacks = map[int32]pub.ReqFunc{}
+
 	svr = &GameServer{
 		endpoint: endpoint,
 		sessions: map[int]*Session{},
