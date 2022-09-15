@@ -41,7 +41,7 @@ func QueryFloat(sqlSeq string) (bool, float64) {
 	row := db.QueryRow(sqlSeq)
 	err := row.Scan(&num)
 	if err == sql.ErrNoRows {
-		return true, 0
+		return false, -1
 	} else if err != nil {
 		logger.Error("query sql(%s) erorr: %v", sqlSeq, err)
 		return false, 0
@@ -56,7 +56,7 @@ func QueryInt(sqlSeq string) (bool, int) {
 	row := db.QueryRow(sqlSeq)
 	err := row.Scan(&num)
 	if err == sql.ErrNoRows {
-		return true, 0
+		return false, -1
 	} else if err != nil {
 		logger.Error("query sql(%s) erorr: %v", sqlSeq, err)
 		return false, 0
