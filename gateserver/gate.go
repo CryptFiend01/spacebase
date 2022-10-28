@@ -41,6 +41,7 @@ var (
 )
 
 func NewGateServer(endpoint string) *GateServer {
+	callbacks = map[int32]pub.ReqFunc{}
 	return &GateServer{endpoint: endpoint}
 }
 
