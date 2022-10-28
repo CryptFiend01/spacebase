@@ -17,6 +17,10 @@ import (
 	"github.com/wonderivan/logger"
 )
 
+type GateServer struct {
+	port string
+}
+
 var (
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
@@ -35,6 +39,32 @@ var (
 	MsgProtoName    string
 	PackLoginFunc   func(ct90 string, tk90 string) proto.Message
 )
+
+func NewGateServer(port string) *GateServer {
+	return &GateServer{port: port}
+}
+
+func (svr *GateServer) Broadcast(cmd int32, msg proto.Message) bool {
+	return SendMsg(nil, cmd, msg, 0, 0)
+}
+
+func (svr *GateServer) SendPlayer(playerId int, cmd int32, msg proto.Message) bool {
+	return SendMsg(nil, cmd, msg, 0, playerId)
+}
+
+func (svr *GateServer) SendPlayerErr(playerId int, cmd int32, errNo int) bool {
+	return SendError(nil, cmd, errNo, 0, playerId)
+}
+
+func (svr *GateServer) GetConnectionCount() int {
+	lock.Lock()
+	defer lock.Unlock()
+	return len(connections)
+}
+
+func (svr *GateServer) GetMaxConnectionCount() int {
+	return 60000
+}
 
 // 将游戏服数据广播给所有连接
 func Broadcast(data []byte) {
@@ -327,12 +357,12 @@ func check() bool {
 	return true
 }
 
-func Init(port string) bool {
+func (svr *GateServer) Start() bool {
 	if !check() {
 		return false
 	}
 
 	http.HandleFunc("/", Session)
-	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil)
+	go http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", svr.port), nil)
 	return true
 }
