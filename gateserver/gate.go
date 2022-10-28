@@ -146,7 +146,7 @@ func SendError(conn *net.Conn, cmd int32, errNo int, reqId int, connectId int) b
 	binary.LittleEndian.PutUint16(buf[0:2], uint16(cmd))
 	binary.LittleEndian.PutUint16(buf[2:4], 0)
 	binary.LittleEndian.PutUint32(buf[4:8], uint32(reqId))
-	binary.LittleEndian.PutUint32(buf[12:16], uint32(errNo))
+	binary.LittleEndian.PutUint32(buf[8:12], uint32(errNo))
 
 	if !SendData(connectId, buf) {
 		logger.Error("Send message %s error failed!", CmdNameFunc(cmd))
