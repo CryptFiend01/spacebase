@@ -366,6 +366,8 @@ func (svr *GateServer) Start() bool {
 		connIds.PushBack(i)
 	}
 
+	RegisterMsgFunc()
+
 	http.HandleFunc("/", Session)
 	go http.ListenAndServe(svr.endpoint, nil)
 	return true
