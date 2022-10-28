@@ -16,3 +16,13 @@ type Request struct {
 	Msg      proto.Message
 	Fproc    ReqFunc
 }
+
+type GateReqFunc func(playerId int, reqId int, imsg proto.Message)
+
+type GateRequest struct {
+	PlayerId int
+	ClientIp string
+	ReqId    int
+	Msg      proto.Message
+	Fproc    GateReqFunc
+}
