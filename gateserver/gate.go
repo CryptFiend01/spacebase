@@ -247,6 +247,11 @@ func Session(w http.ResponseWriter, r *http.Request) {
 			} else if mt == websocket.BinaryMessage {
 				// 游戏只处理二进制数据，其余忽略
 				cmd := int32(binary.LittleEndian.Uint16(data[0:2]))
+				if cmd == gameserver.CHeartBeatCmd {
+					SendMsg(nil, gameserver.SHeartBeatCmd, nil, 0, connectId)
+					continue
+				}
+
 				reqId := int(binary.LittleEndian.Uint32(data[4:8]))
 				f := getCallback(cmd)
 				if f == nil {
