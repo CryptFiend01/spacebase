@@ -18,7 +18,7 @@ import (
 )
 
 type GateServer struct {
-	port string
+	endpoint string
 }
 
 var (
@@ -40,8 +40,8 @@ var (
 	PackLoginFunc   func(ct90 string, tk90 string) proto.Message
 )
 
-func NewGateServer(port string) *GateServer {
-	return &GateServer{port: port}
+func NewGateServer(endpoint string) *GateServer {
+	return &GateServer{endpoint: endpoint}
 }
 
 func (svr *GateServer) Broadcast(cmd int32, msg proto.Message) bool {
@@ -362,7 +362,11 @@ func (svr *GateServer) Start() bool {
 		return false
 	}
 
+	for i := 1; i <= 60000; i++ {
+		connIds.PushBack(i)
+	}
+
 	http.HandleFunc("/", Session)
-	go http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", svr.port), nil)
+	go http.ListenAndServe(svr.endpoint, nil)
 	return true
 }
