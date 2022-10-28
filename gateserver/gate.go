@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/binary"
 	"fmt"
+	"net"
 	"net/http"
 	"reflect"
 	"strings"
@@ -25,7 +26,7 @@ var (
 	connIds     = list.New()
 	lock        sync.Mutex
 
-	callbacks       map[int32]pub.GateReqFunc
+	callbacks       map[int32]pub.ReqFunc
 	IsLogMsg        bool
 	CmdNameFunc     func(cmd int32) string
 	PushMsgFunc     func(msg *pub.GateRequest)
@@ -70,11 +71,11 @@ func SendData(cid int, data []byte) bool {
 	return true
 }
 
-func SendMsg(cid int, cmd int32, imsg proto.Message, reqId int) bool {
+func SendMsg(conn *net.Conn, cmd int32, msg proto.Message, reqId int, connectId int) bool {
 	var data []byte
 	var err error
-	if imsg != nil {
-		data, err = proto.Marshal(imsg)
+	if msg != nil {
+		data, err = proto.Marshal(msg)
 		if err != nil {
 			logger.Error("Pack message error! err=%s\n", err)
 			return false
@@ -94,7 +95,7 @@ func SendMsg(cid int, cmd int32, imsg proto.Message, reqId int) bool {
 		copy(buf[12:], data)
 	}
 
-	if !SendData(cid, data) {
+	if !SendData(connectId, data) {
 		logger.Error("Send message %s failed!", CmdNameFunc(cmd))
 		return false
 	}
@@ -108,7 +109,7 @@ func SendMsg(cid int, cmd int32, imsg proto.Message, reqId int) bool {
 	return true
 }
 
-func SendError(cid int, cmd int32, errNo int, reqId int) bool {
+func SendError(conn *net.Conn, cmd int32, errNo int, reqId int, connectId int) bool {
 	len := 12
 	buf := make([]byte, len)
 	binary.LittleEndian.PutUint16(buf[0:2], uint16(cmd))
@@ -116,15 +117,15 @@ func SendError(cid int, cmd int32, errNo int, reqId int) bool {
 	binary.LittleEndian.PutUint32(buf[4:8], uint32(reqId))
 	binary.LittleEndian.PutUint32(buf[12:16], uint32(errNo))
 
-	if !SendData(cid, buf) {
-		logger.Error("Send error %s failed!", CmdNameFunc(cmd))
+	if !SendData(connectId, buf) {
+		logger.Error("Send message %s error failed!", CmdNameFunc(cmd))
 		return false
 	}
 
 	if IsLogMsg {
 		if cmd != gameserver.SHeartBeatCmd {
 			cmdName := CmdNameFunc(cmd)
-			logger.Debug("Send message %s len 0.", cmdName)
+			logger.Debug("Send error %s.", cmdName)
 		}
 	}
 	return true
@@ -282,11 +283,11 @@ func Session(w http.ResponseWriter, r *http.Request) {
 	ws.Close()
 }
 
-func AddMsgCallback(cmd int32, f pub.GateReqFunc) {
+func AddMsgCallback(cmd int32, f pub.ReqFunc) {
 	callbacks[cmd] = f
 }
 
-func getCallback(cmd int32) pub.GateReqFunc {
+func getCallback(cmd int32) pub.ReqFunc {
 	f, ok := callbacks[cmd]
 	if !ok {
 		return nil
@@ -294,7 +295,7 @@ func getCallback(cmd int32) pub.GateReqFunc {
 	return f
 }
 
-func onDisconnect(playerId int, reqId int, imsg proto.Message) {
+func onDisconnect(conn *net.Conn, playerId int, reqId int, imsg proto.Message) {
 	DisconnectFunc(playerId)
 }
 
