@@ -126,7 +126,7 @@ func SendMsg(conn *net.Conn, cmd int32, msg proto.Message, reqId int, connectId 
 		copy(buf[12:], data)
 	}
 
-	if !SendData(connectId, data) {
+	if !SendData(connectId, buf) {
 		logger.Error("Send message %s failed!", CmdNameFunc(cmd))
 		return false
 	}
