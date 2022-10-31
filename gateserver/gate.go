@@ -116,8 +116,8 @@ func SendMsg(conn *net.Conn, cmd int32, msg proto.Message, reqId int, connectId 
 	}
 
 	msgLen := len(data)
-	len := 12 + msgLen
-	buf := make([]byte, len)
+	bufLen := 12 + msgLen
+	buf := make([]byte, bufLen)
 	binary.LittleEndian.PutUint16(buf[0:2], uint16(cmd))
 	binary.LittleEndian.PutUint16(buf[2:4], uint16(msgLen))
 	binary.LittleEndian.PutUint32(buf[4:8], uint32(reqId))
@@ -134,7 +134,7 @@ func SendMsg(conn *net.Conn, cmd int32, msg proto.Message, reqId int, connectId 
 	if IsLogMsg {
 		cmdName := CmdNameFunc(cmd)
 		if cmdName != "SHeartBeat" {
-			logger.Info("Send message %s len %d.", cmdName, msgLen)
+			logger.Info("Send message %s len %d total len %d.", cmdName, msgLen, len(buf))
 		}
 	}
 	return true
