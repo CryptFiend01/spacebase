@@ -252,6 +252,11 @@ func Session(w http.ResponseWriter, r *http.Request) {
 					continue
 				}
 
+				if IsLogMsg {
+					cmdName := CmdNameFunc(cmd)
+					logger.Debug("Send error %s.", cmdName)
+				}
+
 				reqId := int(binary.LittleEndian.Uint32(data[4:8]))
 				f := getCallback(cmd)
 				if f == nil {
