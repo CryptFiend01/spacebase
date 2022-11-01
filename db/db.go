@@ -65,7 +65,7 @@ func QueryInt(sqlSeq string) (bool, int) {
 	return true, int(num.Int32)
 }
 
-func ConnectDB(driveName string, dbInfo string) *sql.DB {
+func ConnectDB(driveName string, dbInfo string, maxOpenConn int) *sql.DB {
 	var err error
 	db, err := sql.Open(driveName, dbInfo)
 	if err != nil {
@@ -73,7 +73,7 @@ func ConnectDB(driveName string, dbInfo string) *sql.DB {
 		return nil
 	}
 
-	db.SetMaxOpenConns(5)
+	db.SetMaxOpenConns(maxOpenConn)
 	return db
 }
 
@@ -105,9 +105,9 @@ func ExecMultiSql(sqls []string) bool {
 	return !hasErr
 }
 
-func Init(dbInfo string) bool {
+func Init(dbInfo string, maxOpenConn int) bool {
 	// db = ConnectDB("postgres", dbInfo)
-	db = ConnectDB("mysql", dbInfo)
+	db = ConnectDB("mysql", dbInfo, maxOpenConn)
 	if db == nil {
 		logger.Error("Connect db failed!")
 		return false
