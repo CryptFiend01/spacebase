@@ -105,7 +105,18 @@ func ExecMultiSql(sqls []string) bool {
 	return !hasErr
 }
 
-func Init(dbInfo string, maxOpenConn int) bool {
+func Init(dbInfo string) bool {
+	// db = ConnectDB("postgres", dbInfo)
+	db = ConnectDB("mysql", dbInfo, 5)
+	if db == nil {
+		logger.Error("Connect db failed!")
+		return false
+	}
+
+	return true
+}
+
+func InitOpenConns(dbInfo string, maxOpenConn int) bool {
 	// db = ConnectDB("postgres", dbInfo)
 	db = ConnectDB("mysql", dbInfo, maxOpenConn)
 	if db == nil {
